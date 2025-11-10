@@ -89,6 +89,7 @@ analyzeEspnGameRecap = function(game.id){
   df$Home.Pts = final.score$homeScore
   
   df$OnePoss4qtr = isOnePossessionInFourthQuarter(scoring.plays)
+  df$Game.id = game.id
   return(df)
 }
 isOnePossessionInFourthQuarter = function(scoring.plays){
@@ -132,7 +133,10 @@ getSeasonGameData = function(season){
       x = tryCatch({
         analyzeEspnGameRecap(id)
       }, error = function(e){
-        stop(paste("Error when analyzing game", id, "\n"), e)
+        print(paste("Error when analyzing game", id, "\n"), e)
+        x = dfx[1, ]
+        x$Game.id = id
+        return(x)
       })
       
       dfx = dfx %>% 
@@ -165,9 +169,10 @@ beepr::beep()
 
 
 # investigate game 400554366
+# 400554214 and 400554215 too
 
 
-
+## remember to commit changes to the git repo! 
 
 
 
