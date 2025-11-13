@@ -164,7 +164,7 @@ getNflGameData = function(seasons){
     # setTxtProgressBar(pb, match(s, seasons))
   }
   # close(pb)
-  assign("nfl.game.data", df)
+  assign("nfl.game.data", df, envir = .GlobalEnv)
   View(nfl.game.data)
   beepr::beep()
 }
