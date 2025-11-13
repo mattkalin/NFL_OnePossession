@@ -128,23 +128,27 @@ getSeasonGameData = function(season){
     espn.json = fromJSON(content(GET(espn.url), "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)
     game.ids = espn.json$items$`$ref` %>% 
       str_extract("\\d{9}")
-    # pb = txtProgressBar(max = length(game.ids), style = 3)
+    print(paste("Getting", ifelse(season.type == 2, "regular season", "playoffs"), 
+                "data for the", season, "season..."))
+    pb = txtProgressBar(max = length(game.ids), style = 3)
     for(id in game.ids){
       x = tryCatch({
         analyzeEspnGameRecap(id)
       }, error = function(e){
         print(paste("Error when analyzing game", id, "\n"), e)
         x = dfx[1, ]
+        x[] = NA
         x$Game.id = id
         return(x)
       })
       
       dfx = dfx %>% 
         rbind(x)
-      # setTxtProgressBar(pb, match(id, game.ids))
+      setTxtProgressBar(pb, match(id, game.ids))
     }
+    close(pb)
     dfx$Playoffs = season.type == 3
-    dfx$Game.id = game.ids
+    # dfx$Game.id = game.ids
     df = df %>% rbind(dfx)
   }
   return(df)
@@ -153,13 +157,13 @@ getNflGameData = function(seasons){
   require(dplyr)
   print(paste("Getting data for seasons", seasons[1], "-", tail(seasons, 1)))
   df = data.frame()
-  pb = txtProgressBar(max = length(seasons), style = 3)
+  # pb = txtProgressBar(max = length(seasons), style = 3)
   for(s in seasons){
     df = df %>% 
       rbind(getSeasonGameData(s))
-    setTxtProgressBar(pb, match(s, seasons))
+    # setTxtProgressBar(pb, match(s, seasons))
   }
-  close(pb)
+  # close(pb)
   assign("nfl.game.data", df)
   View(nfl.game.data)
   beepr::beep()
